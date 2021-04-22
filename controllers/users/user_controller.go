@@ -1,28 +1,30 @@
 package users
 
 import (
-	"encoding/json"
 	"fmt"
 	"golang-gin-microservice/domain/users"
-	"io/ioutil"
+	"golang-gin-microservice/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func CreateUser(c *gin.Context) {
-	var users users.User
-	fmt.Println(users)
-	bytes, err := ioutil.ReadAll(c.Request.Body)
+	var user users.User
+	fmt.Println(user)
+	if err := c.ShouldBindJSON(&user); err != nil { //using shouldBIndJSOn() in place of reading the data from body and
+		//   Unmarshalling it.
+		// TODO: Handle Error
+		return
+	}
+
+	result, err := services.CreateUser(user)
 	if err != nil {
 		// TODO: Handle Error
+		return
 	}
-	if err := json.Unmarshal(bytes, &users); err != nil {
 
-	}
-	fmt.Println(string(bytes))
-	fmt.Println(err)
-	c.JSON(http.StatusNotImplemented, "implement me!")
+	c.JSON(http.StatusCreated, result)
 
 }
 
