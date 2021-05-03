@@ -6,6 +6,7 @@ import (
 	"golang-gin-microservice/services"
 	"golang-gin-microservice/utils/errors"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,11 +16,7 @@ func CreateUser(c *gin.Context) {
 	fmt.Println(user)
 	if err := c.ShouldBindJSON(&user); err != nil { //using shouldBIndJSOn() in place of reading the data from body and
 		//   Unmarshalling it.
-		restError := errors.RestErr{
-			Message: "invalid json body",
-			Status:  http.StatusBadRequest,
-			Error:   "bad request",
-		}
+		restError := errors.NewBadRequestError("invalid json body")
 		c.JSON(restError.Status, restError)
 		return
 	}
@@ -35,8 +32,17 @@ func CreateUser(c *gin.Context) {
 }
 
 func FindUser(c *gin.Context) {
-
-	c.JSON(http.StatusNotImplemented, "implement me!")
+	userId, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	if userErr != nil {
+		err := errors.NewBadRequestError("invalid User ID, should be a number")
+		c.JSON(err.Status, err)
+		return
+	}
+	result, getErr := services.GetUser(userId)
+	if getErr != nil {
+		c.JSON(getErr.Status, getErr)
+	}
+	c.JSON(http.StatusOK, result)
 
 }
 
