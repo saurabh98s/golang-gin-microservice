@@ -13,17 +13,19 @@ import (
 
 func CreateUser(c *gin.Context) {
 	var user users.User
-	fmt.Println(user)
 	if err := c.ShouldBindJSON(&user); err != nil { //using shouldBIndJSOn() in place of reading the data from body and
 		//   Unmarshalling it.
 		restError := errors.NewBadRequestError("invalid json body")
 		c.JSON(restError.Status, restError)
 		return
 	}
-
+	fmt.Printf("First Name %s , Last Name %s ,Date Created %s", user.FirstName, user.LastName, user.DateCreated)
 	result, err := services.CreateUser(user)
+	if result == nil {
+		return
+	}
 	if err != nil {
-		c.JSON(err.Status, err)
+		c.JSON(err.Status, err.Error)
 		return
 	}
 
