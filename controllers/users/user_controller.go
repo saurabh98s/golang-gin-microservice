@@ -21,11 +21,8 @@ func CreateUser(c *gin.Context) {
 	}
 	fmt.Printf("First Name %s , Last Name %s ,Date Created %s", user.FirstName, user.LastName, user.DateCreated)
 	result, err := services.CreateUser(user)
-	if result == nil {
-		return
-	}
 	if err != nil {
-		c.JSON(err.Status, err.Error)
+		c.JSON(err.Status, err)
 		return
 	}
 
@@ -43,6 +40,7 @@ func FindUser(c *gin.Context) {
 	result, getErr := services.GetUser(userId)
 	if getErr != nil {
 		c.JSON(getErr.Status, getErr)
+		return
 	}
 	c.JSON(http.StatusOK, result)
 
